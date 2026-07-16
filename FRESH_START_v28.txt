@@ -1,0 +1,1 @@
+Controlled one-time fresh-start control. Deletes cloud/local jobs and clears cloud/local Time, Outside Help, Material Status and Inventory. Preserves pricing. Requires explicit button and confirmation. Hides itself after successful reset.

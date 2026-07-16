@@ -1,0 +1,7 @@
+DCC OS v14
+Base: v13 Time + Mission
+Added visible Time Tracking UI.
+Supports Shawn/Summer, job-specific and General DCC Business time.
+Categories include fabrication, estimating, install, customer communication, marketing/social, photography/content, ordering/supplies, admin, bookkeeping, shop support, and other DCC work.
+Uses the v13 cloud time bridge.
+No estimator, quote, purchase, job sync, header, or pricing logic changed.

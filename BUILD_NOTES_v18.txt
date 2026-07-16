@@ -1,0 +1,7 @@
+DCC OS v18 - Time Selection Fix
+Base: v17.
+Fixed manual Time dropdown selection display.
+Added live Current Selection block that updates immediately when Who, Work Type, Job/Business, or Hours changes.
+Manual time entry does NOT require Start Work / Stop Work clock.
+Save Time writes the selected values and refreshes Time totals.
+Estimator, Quote, Purchase, Pricing, Jobs, access, and job sync logic unchanged.

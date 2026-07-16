@@ -1,0 +1,6 @@
+DCC OS v32 Hidden Automatic Mileage
+Mileage calculation now runs in the background from the customer address.
+Shop origin remains 213 Claremont Ave, East Peoria, IL 61611.
+Default remains 3 round trips and $0.68 per billable mile beyond 30 one-way miles.
+The visible mileage control block was removed from Customer Info.
+Travel/Mileage remains a calculated quote charge.

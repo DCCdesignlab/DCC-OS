@@ -1,0 +1,1 @@
+DCC OS v20 Outside Help. Adds dropdown-driven Person, Work Type, Job/General Business, optional hours, flat amount paid and note. Cloud-backed through existing settings API. Job time breakdown shows outside labor paid. Production engine unchanged.

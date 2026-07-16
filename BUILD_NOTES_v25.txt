@@ -1,0 +1,10 @@
+DCC OS v25 Operational Backbone
+Base: v24.
+Closes the operational backbone:
+- Customer/job operational checklist.
+- Customer Info → Quote → Purchase → Production readiness gates.
+- Cloud-saved workflow stage and operational completion checks.
+- Paper-friendly customer quote preview and print/save action.
+- Ink-friendly print output preserved.
+- Production workflow, Inventory/Purchase reconciliation, Materials Control, Job Command, Time/Outside Help retained.
+No estimator math or purchase quantity calculations changed.

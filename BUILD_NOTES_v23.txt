@@ -1,0 +1,6 @@
+DCC OS v23 Materials Control
+Base: v22.
+Adds Purchase-screen-only material status tracking: Need, Ordered, Picked Up, In Shop.
+Status is stored by current customer/job and cloud-backed through the existing settings API.
+Production workflow and paper-friendly quote retained.
+Estimator math, quote totals, purchase quantity calculations, pricing, Time, private access and job sync engine unchanged.

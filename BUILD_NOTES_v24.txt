@@ -1,0 +1,1 @@
+DCC OS v24 Inventory + Purchase Reconciliation. Adds cloud-backed current inventory, on-hand quantity, unit, restock level, location, last updated, and Purchase comparison of Job Need vs On Hand to calculate Buy quantity. Existing production engine unchanged.

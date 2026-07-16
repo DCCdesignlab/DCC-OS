@@ -1,0 +1,9 @@
+DCC OS v22 Operations Bundle
+Base: v21.
+Bundled multiple operational upgrades:
+- Jobs-screen production workflow: Measure through Final Payment.
+- Workflow state saves in existing cloud job records.
+- Customer Quote print/save control when quote template is present.
+- Ink-friendly Letter print CSS: white background, black text, no dark app chrome, no heavy shadows.
+- Existing Job Command retained.
+No estimator math, quote totals, purchase calculations, pricing, Time, access, or cloud job sync engine changed.

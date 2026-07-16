@@ -1,0 +1,9 @@
+DCC OS v30 Auto Mileage
+Base: v29.
+Shop origin: 213 Claremont Ave, East Peoria, IL 61611.
+Driving mileage calculated from customer address.
+Default 3 round trips: estimate, sample/template, install.
+Charge formula: max(one-way driving miles - 30, 0) x 2 x round trips x $0.68.
+Travel/Mileage is added to quote subtotal and displayed separately on customer quote.
+Round trips can be adjusted per job.
+No estimator material/labor formulas changed.

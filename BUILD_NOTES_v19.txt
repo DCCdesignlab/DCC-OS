@@ -1,0 +1,5 @@
+DCC OS v19 - Job Time Breakdown
+Base: v18.
+Adds a customer/job labor report only on the Time screen.
+Select any saved customer/job and see total hours, hours by person, and hours by standardized work type.
+Uses existing cloud time data. No production estimator, quote, purchase, pricing, jobs, access, or sync logic changed.

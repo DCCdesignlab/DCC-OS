@@ -1,0 +1,1 @@
+Removed global Mission Control from every screen. Time summaries now live only on Time: current customer/job total plus this week, this month, and this year DCC totals. Existing estimator, quote, purchase, pricing, jobs, access and sync logic unchanged.

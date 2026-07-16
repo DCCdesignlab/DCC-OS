@@ -1,0 +1,6 @@
+DCC OS v29 Auto Estimate Number
+Base: v28 Fresh Start Reset.
+Automatically assigns sequential estimate numbers in DCC-0001 format before jobs save.
+Existing estimate numbers are preserved.
+The next number is based on the highest saved DCC estimate number currently loaded.
+No estimator math, quote totals, purchase calculations, pricing, time, inventory, or production workflow changed.

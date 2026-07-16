@@ -1,0 +1,5 @@
+DCC OS v26 Production Candidate
+Base: v25 Operational Backbone.
+Adds Jobs-screen Needs Attention follow-up board and Business Snapshot reporting.
+Retains cloud jobs, production estimator, quote/purchase logic, Time, outside help, Job Command, production workflow, materials status, inventory reconciliation, and paper-friendly quote.
+No estimator math or purchase quantity formulas changed.

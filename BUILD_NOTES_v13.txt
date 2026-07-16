@@ -1,0 +1,6 @@
+DCC OS v13 - Time + Mission bridge
+Base: DCC_OS_APP_PRODUCTION_ENGINE_JULY4.zip
+Preserved production estimator/quote/purchase and cloud jobs.
+Added cloud-backed DCC time log merge/push through existing settings API.
+Added Mission snapshot helper for active jobs, time entries, and total hours.
+Cache bumped to v13.
