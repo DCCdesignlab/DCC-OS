@@ -42,7 +42,17 @@ let pricing=Object.assign({},pricingDefaults,JSON.parse(localStorage.getItem("dc
 let current="customer",activeModule="countertop";
 function save(){localStorage.setItem("dcc-os-state",JSON.stringify(state))}
 function savePricing(){localStorage.setItem("dcc-os-pricing",JSON.stringify(pricing))}
-function jobs(){return JSON.parse(localStorage.getItem("dcc-os-jobs")||"[]")}
+function jobs(){
+    const list=JSON.parse(localStorage.getItem("dcc-os-jobs")||"[]");
+
+    return list.map(job=>({
+        ...job,
+        project:Object.assign(
+            clone(EMPTY_PROJECT),
+            job.project||{}
+        )
+    }));
+}
 function saveJobs(v){localStorage.setItem("dcc-os-jobs",JSON.stringify(v))}
 async function fetchJobCloud(pathOptions, options={}){
  let lastErr;
