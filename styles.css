@@ -112,7 +112,7 @@
 .dcc-time-hero h2{margin:5px 0 4px;font-size:28px}.dcc-time-hero p{margin:0;opacity:.8}.eyebrow{font-size:12px;font-weight:900;letter-spacing:.12em;opacity:.75}
 .time-total{text-align:center;min-width:120px}.time-total b{display:block;font-size:38px}.time-total span{font-size:11px;font-weight:900;letter-spacing:.1em}
 .dcc-time-entry{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.dcc-time-entry label{font-size:11px;font-weight:900;letter-spacing:.08em;color:#526275}.dcc-time-entry input,.dcc-time-entry select{width:100%;margin-top:6px;padding:13px;border:1px solid #cfd9e5;border-radius:13px;font-size:16px;background:#fff}
+.dcc-time-entry label{font-size:11px;font-weight:900;letter-spacing:.08em;color:#526275}.dcc-time-entry input,.dcc-time-entry select{width:100%;margin-top:6px;padding:13px;border:1px solid #cfd9e5;border-radius:13px;font-size:16px;background:#fff;color:#102a47}
 .time-note{grid-column:1/-1}.dcc-time-entry button{grid-column:1/-1;border:0;border-radius:14px;padding:15px;background:#102a47;color:#fff;font-weight:900;font-size:16px}
 #dccTimeStatus{grid-column:1/-1;text-align:center;font-weight:800;color:#35506e}
 .time-summary-row,.time-row{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-top:1px solid #e6ebf1}.time-row div{display:flex;flex-direction:column;gap:4px}.time-row span{color:#66768a;font-size:13px}.time-row strong{white-space:nowrap}
