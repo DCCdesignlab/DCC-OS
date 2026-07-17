@@ -251,8 +251,20 @@ function calc(){return projectMetrics()}
 
 function render(screen=current){if(screen==="mission"||!document.getElementById(screen))screen="customer";current=screen;$$('.tabbar button').forEach(b=>b.classList.toggle('active',b.dataset.screen===screen));$('#screen').innerHTML=$('#'+screen).innerHTML;$('#topStatus').textContent=state.jobStatus||'Draft Quote';bindScreen();updateBindings()}
 function bindScreen(){
- $$('input,select,textarea').forEach(el=>{const key=el.id;if(!key||key.startsWith('price'))return;if(key==='beforePhoto'||key==='conceptPhoto'){el.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{state[key]=rd.result;save();render(current)};rd.readAsDataURL(f)});return}el.value=state[key]??'';el.addEventListener('input',()=>{state[key]=el.type==='number'?+el.value:el.value;save();updateBindings()})});
- if($('#dccMileageV30'))dccBindMileageV30();if($('#beforePreview'))photoPreview('beforePhoto','beforePreview');if($('#conceptPreview'))photoPreview('conceptPhoto','conceptPreview');if($('#purchaseList'))drawPurchase();if($('#kanban'))drawKanban();if($('#savedJobs'))drawSavedJobs();if($('#timeEntries')){bindTimeClock();setTimeout(dccRenderTimeTracking,0);setTimeout(dccRenderTimeSummary,0);setTimeout(dccRenderJobTimeBreakdown,0);setTimeout(dccRenderOutsideHelp,0)}if($('#dccJobCommandV21'))setTimeout(dccRenderJobCommand,0);if($('#dccProductionV22'))setTimeout(dccRenderProductionV22,0);if($('#dccMaterialsV23')){setTimeout(dccRenderMaterialsV23,100);setTimeout(dccRenderPurchaseReconcileV24,180)}if($('#dccInventoryV24'))setTimeout(dccRenderInventoryV24,0);if($('#dccBackboneV25'))setTimeout(dccRenderBackboneV25,0);if($('#dccFreshStartV28'))setTimeout(dccRenderFreshStartV28,0);if($('#dccBusinessReportV26'))setTimeout(dccRenderBusinessReportV26,0);if($('#dccFollowupsV26'))setTimeout(dccRenderFollowupsV26,0);if(current==='pricing')bindPricing();
+ $$('input,select,textarea').forEach(el=>{const key=el.id;if(!key||key.startsWith('price'))return;if(
+    key==='beforePhoto' ||
+    key==='conceptPhoto' ||
+    key==='customerDrawing'
+){el.addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{state[key]=rd.result;save();render(current)};rd.readAsDataURL(f)});return}el.value=state[key]??'';el.addEventListener('input',()=>{state[key]=el.type==='number'?+el.value:el.value;save();updateBindings()})});
+ if($('#dccMileageV30'))dccBindMileageV30();if($('#beforePreview'))photoPreview('beforePhoto','beforePreview');if($('#conceptPreview'))photoPreview('conceptPhoto','conceptPreview');if($('#customerDrawingStatus')){
+    if(state.customerDrawing){
+        $('#customerDrawingStatus').innerHTML =
+            '<strong>✓ Drawing uploaded</strong>';
+    }else{
+        $('#customerDrawingStatus').innerHTML =
+            '<strong>No drawing uploaded.</strong>';
+    }
+}if($('#purchaseList'))drawPurchase();if($('#kanban'))drawKanban();if($('#savedJobs'))drawSavedJobs();if($('#timeEntries')){bindTimeClock();setTimeout(dccRenderTimeTracking,0);setTimeout(dccRenderTimeSummary,0);setTimeout(dccRenderJobTimeBreakdown,0);setTimeout(dccRenderOutsideHelp,0)}if($('#dccJobCommandV21'))setTimeout(dccRenderJobCommand,0);if($('#dccProductionV22'))setTimeout(dccRenderProductionV22,0);if($('#dccMaterialsV23')){setTimeout(dccRenderMaterialsV23,100);setTimeout(dccRenderPurchaseReconcileV24,180)}if($('#dccInventoryV24'))setTimeout(dccRenderInventoryV24,0);if($('#dccBackboneV25'))setTimeout(dccRenderBackboneV25,0);if($('#dccFreshStartV28'))setTimeout(dccRenderFreshStartV28,0);if($('#dccBusinessReportV26'))setTimeout(dccRenderBusinessReportV26,0);if($('#dccFollowupsV26'))setTimeout(dccRenderFollowupsV26,0);if(current==='pricing')bindPricing();
  if(current==='project'){drawModule();$$('[data-module]').forEach(b=>b.addEventListener('click',()=>{activeModule=b.dataset.module;drawModule()}));$('#clearJob').addEventListener('click',()=>{if(confirm('Clear the current DCC job and start fresh?')){state=clone(defaults);save();render('customer')}})}
  if($('#printQuote'))$('#printQuote').onclick=()=>window.print();if($('#nextActionBtn'))$('#nextActionBtn').onclick=()=>render(nextScreen());if($('#newJob'))$('#newJob').onclick=newJob;if($('#saveJob'))$('#saveJob').onclick=saveCurrentJob;
  $$('[data-open-module]').forEach(b=>b.onclick=()=>{activeModule=b.dataset.openModule;render('project')})
