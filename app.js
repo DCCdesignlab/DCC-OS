@@ -39,7 +39,23 @@ state.project=Object.assign(
 state.deep=Object.assign({},defaults.deep,state.deep||{});state.universal=Object.assign({},defaults.universal,state.universal||{});state.timeEntries=state.timeEntries||[];state.backlit=Object.assign({},defaults.backlit,state.backlit||{});state.pieces=state.pieces?.length?state.pieces:clone(defaults.pieces);
 state.pieces=state.pieces.map((p,i)=>({name:p.name||`Piece ${i+1}`,surfaceType:p.surfaceType||(p.vertical?"Horizontal":"Horizontal"),length:p.length??"",width:p.width===""||p.width==null?25.25:p.width,backsplash:p.backsplash??(!!p.vertical),backsplashHeight:p.backsplashHeight??(+p.vertical||4)}));
 let pricing=Object.assign({},pricingDefaults,JSON.parse(localStorage.getItem("dcc-os-pricing")||"null")||{});
-let current="customer",activeModule="countertop";
+async function analyzeProjectDrawing(file){
+
+    const project = clone(EMPTY_PROJECT);
+
+    project.drawing = {
+        name:file.name,
+        uploaded:new Date().toISOString()
+    };
+
+    project.aiSummary = "Analyzing drawing...";
+    project.lastAIUpdate = new Date().toISOString();
+
+    state.project = project;
+    save();
+
+    return project;
+}
 function save(){localStorage.setItem("dcc-os-state",JSON.stringify(state))}
 function savePricing(){localStorage.setItem("dcc-os-pricing",JSON.stringify(pricing))}
 function jobs(){
