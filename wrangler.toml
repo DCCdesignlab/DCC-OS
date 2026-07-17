@@ -1,0 +1,21 @@
+name = "dcc-os-api"
+main = "./worker.js"
+compatibility_date = "2026-07-17"
+type = "javascript"
+workers_dev = true
+
+[build]
+upload_format = "modules"
+
+# If you need R2, D1, or other bindings, configure them here.
+# Example:
+# [[r2_buckets]]
+# binding = "IMAGES"
+# bucket_name = "your-r2-bucket"
+#
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "your-d1-database"
+#
+# [vars]
+# OPENAI_API_KEY = "your-openai-api-key"
