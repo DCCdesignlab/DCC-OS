@@ -151,7 +151,7 @@ async function savePricingToCloud(){
  }catch(e){console.warn(e);return null}
 }
 async function refreshCloudData(){
- await Promise.all([syncJobsFromCloud(),syncTimeFromCloud(),syncSettingsFromCloud()]);
+ await Promise.all([syncJobsFromCloud(),syncTimeFromCloud(),syncLocalTimeWithCloud(),syncSettingsFromCloud()]);
  if($("#savedJobs"))drawSavedJobs();if($("#kanban"))drawKanban();syncDerivedScreens();
 }
 
@@ -170,6 +170,51 @@ async function saveTimeEntryToCloud(entry){
  const payload={id:entry.id||crypto.randomUUID(),job_id:entry.jobId||state._jobId||"",worker:entry.worker||"",work_type:entry.workType||"",start_time:entry.start||"",end_time:entry.end||"",hours:Number(entry.hours||0),note:entry.note||""};
  const r=await fetch(apiUrl("/api/time"),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
  if(!r.ok)throw new Error("Cloud time save failed");return r.json();
+}
+
+function mergeDccTimeRows(row){
+ const rows=dccTimeRows();
+ const ix=rows.findIndex(r=>r.id===row.id);
+ if(ix>=0){rows[ix]=row;}else{rows.push(row)}
+ dccSaveTimeRows(rows);
+ return rows;
+}
+
+function persistTimeEntryToJob(entry){
+ if(!entry.jobId||entry.jobId==="GENERAL_DCC")return;
+ const all=jobs();
+ const job=all.find(j=>String(j.id)===String(entry.jobId));
+ if(!job)return;
+ job.state.timeEntries=Array.isArray(job.state.timeEntries)?job.state.timeEntries.slice():[];
+ const idx=job.state.timeEntries.findIndex(e=>e.id===entry.id);
+ if(idx>=0){job.state.timeEntries[idx]=entry;}else{job.state.timeEntries.unshift(entry)}
+ saveJobs(all);
+ if(state._jobId&&String(state._jobId)===String(entry.jobId)){
+    state.timeEntries=job.state.timeEntries;
+    save();
+ }
+}
+
+let dccTimeCloudSaveTimer=null;
+async function syncLocalTimeWithCloud(){
+ const pushed=await dccCloudTimePush();
+ if(!pushed){
+    queueDccCloudTimeSync();
+    return false;
+ }
+ const rows=await dccCloudTimePull();
+ if(state._jobId){
+    state.timeEntries=rows.filter(e=>String(e.jobId)===String(state._jobId));
+    save();
+ }
+ return true;
+}
+
+function queueDccCloudTimeSync(delay=2000){
+ clearTimeout(dccTimeCloudSaveTimer);
+ dccTimeCloudSaveTimer=setTimeout(async()=>{
+    try{await syncLocalTimeWithCloud()}catch(e){console.warn('Time sync retry failed:',e)}
+ },delay);
 }
 
 function money(n){return(Number(n)||0).toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:2})}
@@ -443,24 +488,25 @@ async function dccRenderTimeTracking(){
     if(!enteredHours||enteredHours<=0){status.textContent="Enter hours first.";return}
     const jobId=jobSel.value;
     const jobName=jobSel.options[jobSel.selectedIndex]?.text||"General DCC Business";
-    const saved=dccTimeRows();
-    saved.push({
+    const row={
       id:(crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random()),
       who:who.value,
       category:category.value,
-      job:jobId||"GENERAL_DCC",
+      jobId:jobId||"GENERAL_DCC",
       jobName:jobId?jobName:"General DCC Business",
       hours:enteredHours,
       note:document.getElementById("dccTimeNote").value.trim(),
       createdAt:new Date().toISOString()
-    });
-    dccSaveTimeRows(saved);
+    };
+    mergeDccTimeRows(row);
+    persistTimeEntryToJob(row);
     status.textContent="Saving to cloud…";
-    const ok=await dccCloudTimePush();
+    const ok=await syncLocalTimeWithCloud();
     await dccRenderTimeTracking();
     await dccRenderTimeSummary();
+    if(row.jobId&&row.jobId!=="GENERAL_DCC"){drawSavedJobs();drawKanban();}
     const newStatus=document.getElementById("dccTimeStatus");
-    if(newStatus)newStatus.textContent=ok?"Saved to cloud.":"Saved on this device; cloud retry needed.";
+    if(newStatus)newStatus.textContent=ok?"Saved to cloud.":"Saved locally; will retry cloud sync.";
   };
 }
 window.dccRenderTimeTracking=dccRenderTimeTracking;
