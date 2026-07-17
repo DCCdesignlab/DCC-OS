@@ -6,10 +6,36 @@ function apiUrl(path){
 
 
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+/* ============================================================
+   DCC Project Intelligence
+   This becomes the master description of every project.
+   AI, Estimators, Quotes and Renderings all read from here.
+============================================================ */
+
+const EMPTY_PROJECT={
+    drawing:null,
+    rooms:[],
+    countertops:[],
+    backsplashes:[],
+    walls:[],
+    showers:[],
+    islands:[],
+    sinks:[],
+    appliances:[],
+    notes:"",
+    renderPrompt:"",
+    aiSummary:"",
+    lastAIUpdate:null
+};
 const pricingDefaults={counterLabor:35,ledLabor:35,fiberLabor:50,deepLabor:50,actualLaborRate:35,epoxyKit:260,epoxyUsableOz:250,polyKit:280,polyUsableOz:250,colorOzSqFt:5,polyOzSqFt:13,topCoatKit:80,topCoatCoverage:50,deepKit:260,deepOz:375,acrylic:200,ledStrip:50,controller:65,psu:130,plywood:45,suppliesPct:5,overheadPct:5,taxPct:10,substrate:150,substrateUsableSqFt:16,mileageRate:0.68,freeOneWayMiles:30,defaultRoundTrips:3};
 const defaults={customerName:"",phone:"",email:"",estimateNo:"DCC-2026-",projectName:"",address:"",oneWayMiles:0,roundTrips:3,mileageLastAddress:"",finishSystem:"Polykote",depositPct:50,laborDiscountPct:0,salesperson:"Summer",jobStatus:"Draft Quote",notes:"",designNotes:"",pieces:Array.from({length:8},(_,i)=>({name:`Counter ${i+1}`,surfaceType:"Horizontal",length:"",width:25.25,backsplash:false,backsplashHeight:4})),deep:{enabled:false,type:"Straight",length:"",width:"",diameter:"",thickness:1,manualSqFt:""},universal:{enabled:false,manualSqFt:"",laborSqFt:"",materialAllowance:0,laborRate:35,epoxyKits:0,polyKits:0,topCoatKits:0,substrateSheets:0,description:"",customerSuppliedWood:false,embeddedItems:false},timeEntries:[],activeTimer:null,backlit:{enabled:false,orientation:"Vertical",length:48,height:48,spacing:3,acrylicSheets:1,controllerQty:1,controllerCost:65,psuQty:1,psuCost:130,fiberPoints:0,fiberKitCost:0},beforePhoto:"",conceptPhoto:""};
 function clone(v){return JSON.parse(JSON.stringify(v))}
 let state=Object.assign(clone(defaults),JSON.parse(localStorage.getItem("dcc-os-state")||"null")||{});
+
+state.project=Object.assign(
+    clone(EMPTY_PROJECT),
+    state.project||{}
+);
 state.deep=Object.assign({},defaults.deep,state.deep||{});state.universal=Object.assign({},defaults.universal,state.universal||{});state.timeEntries=state.timeEntries||[];state.backlit=Object.assign({},defaults.backlit,state.backlit||{});state.pieces=state.pieces?.length?state.pieces:clone(defaults.pieces);
 state.pieces=state.pieces.map((p,i)=>({name:p.name||`Piece ${i+1}`,surfaceType:p.surfaceType||(p.vertical?"Horizontal":"Horizontal"),length:p.length??"",width:p.width===""||p.width==null?25.25:p.width,backsplash:p.backsplash??(!!p.vertical),backsplashHeight:p.backsplashHeight??(+p.vertical||4)}));
 let pricing=Object.assign({},pricingDefaults,JSON.parse(localStorage.getItem("dcc-os-pricing")||"null")||{});
