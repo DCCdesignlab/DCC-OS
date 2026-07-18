@@ -1,4 +1,4 @@
-name = "dcc-os-api"
+name = "polished-wood-2ac6"
 main = "./worker.js"
 compatibility_date = "2026-07-17"
 workers_dev = true
