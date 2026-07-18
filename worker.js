@@ -362,13 +362,64 @@ export default {
       const path = url.pathname.replace(/\/+$/, "") || "/";
       const method = request.method;
 
-      if (path === "/") {
-        return json({
-          ok: true,
-          app: "DCC OS API",
-          database: "D1 connected",
-          images: env.IMAGES ? "R2 connected" : "R2 missing",
-        });
+      // API routes are handled below. For any non-API browser request,
+      // serve the frontend static files (index.html and assets).
+      // This implementation fetches files from the GitHub raw repo so the
+      // Worker can serve the existing frontend without changing the app files.
+      if (!path.startsWith("/api")) {
+        const assetPath = path === "/" ? "index.html" : path.replace(/^\//, "");
+
+        // Helper: simple mime type mapping for common file extensions
+        const mimeMap = {
+          html: "text/html; charset=utf-8",
+          js: "application/javascript; charset=utf-8",
+          css: "text/css; charset=utf-8",
+          json: "application/json; charset=utf-8",
+          png: "image/png",
+          jpg: "image/jpeg",
+          jpeg: "image/jpeg",
+          webp: "image/webp",
+          svg: "image/svg+xml",
+          ico: "image/x-icon",
+          map: "application/json; charset=utf-8",
+          woff2: "font/woff2",
+          woff: "font/woff",
+          ttf: "font/ttf",
+        };
+
+        function mimeFor(path) {
+          const m = path.split(".").pop().toLowerCase();
+          return mimeMap[m] || "application/octet-stream";
+        }
+
+        try {
+          // __STATIC_CONTENT is provided by Wrangler when you configure [site]
+          // It behaves like a KV namespace with get() support. Use arrayBuffer
+          // for binary files and plain text for others.
+          const isBinary = /\.(png|jpe?g|webp|svg|ico|woff2|woff|ttf)$/i.test(assetPath);
+
+          let value;
+          if (!env.__STATIC_CONTENT) {
+            return json({ error: "Static content binding __STATIC_CONTENT not found." }, 500);
+          }
+
+          if (isBinary) {
+            value = await env.__STATIC_CONTENT.get(assetPath, { type: "arrayBuffer" });
+          } else {
+            value = await env.__STATIC_CONTENT.get(assetPath);
+          }
+
+          if (value === null || value === undefined) {
+            return json({ error: "Asset not found", path: assetPath }, 404);
+          }
+
+          const headers = new Headers({ "Access-Control-Allow-Origin": "*" });
+          headers.set("Content-Type", mimeFor(assetPath));
+
+          return new Response(value, { status: 200, headers });
+        } catch (err) {
+          return json({ ok: false, error: String(err) }, 502);
+        }
       }
 
       if (path === "/api/rendering" && method === "POST") {

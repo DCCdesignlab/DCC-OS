@@ -7,6 +7,13 @@ workers_dev = true
 [build]
 upload_format = "modules"
 
+[site]
+# Upload the repository's static assets so the Worker can serve them via __STATIC_CONTENT.
+# Exclude the Worker script and config files explicitly if needed.
+bucket = "."
+entry-point = "workers-site"
+include = ["index.html", "app.js", "styles.css", "manifest.webmanifest", "sw.js", "assets/**/*", "icon-*.png"]
+
 # If you need R2, D1, or other bindings, configure them here.
 # Example:
 # [[r2_buckets]]

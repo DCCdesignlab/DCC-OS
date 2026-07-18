@@ -2,6 +2,17 @@
 
 .saved-jobs{display:grid;gap:10px;margin-bottom:18px}
 .saved-job{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--line);border-radius:16px;background:#111}
+.scan-drawing-panel{padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.08);margin-bottom:18px;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));}
+.scan-empty,.scan-loading,.scan-error,.scan-info{display:grid;gap:10px}
+.scan-loading strong,.scan-error strong{display:block;margin-bottom:6px}
+.scan-loading{color:#fff}
+.scan-error{color:#ffb3b3}
+.scan-preview{margin-bottom:14px}
+.scan-preview img{width:100%;border-radius:16px;display:block;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.scan-review{display:grid;gap:14px}
+.scan-review-row{display:grid;gap:6px;padding:12px 12px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.02)}
+.scan-review-row span{font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.scan-review-row p{margin:0;color:#fff;word-break:break-word}
 .saved-job>div:first-child{display:flex;flex-direction:column;gap:4px}.saved-job span{color:var(--muted)}
 .saved-job>div:last-child{display:flex;gap:8px}
 .tabbar{overflow-x:auto;scrollbar-width:none}.tabbar::-webkit-scrollbar{display:none}.tabbar button{min-width:100px}
@@ -112,7 +123,7 @@
 .dcc-time-hero h2{margin:5px 0 4px;font-size:28px}.dcc-time-hero p{margin:0;opacity:.8}.eyebrow{font-size:12px;font-weight:900;letter-spacing:.12em;opacity:.75}
 .time-total{text-align:center;min-width:120px}.time-total b{display:block;font-size:38px}.time-total span{font-size:11px;font-weight:900;letter-spacing:.1em}
 .dcc-time-entry{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.dcc-time-entry label{font-size:11px;font-weight:900;letter-spacing:.08em;color:#526275}.dcc-time-entry input,.dcc-time-entry select{width:100%;margin-top:6px;padding:13px;border:1px solid #cfd9e5;border-radius:13px;font-size:16px;background:#fff;color:#102a47}
+.dcc-time-entry label{font-size:11px;font-weight:900;letter-spacing:.08em;color:#526275}.dcc-time-entry input,.dcc-time-entry select{width:100%;margin-top:6px;padding:13px;border:1px solid #cfd9e5;border-radius:13px;font-size:16px;background:#fff;color:#102a47;-webkit-text-fill-color:#102a47}.dcc-time-entry select option{color:#102a47}
 .time-note{grid-column:1/-1}.dcc-time-entry button{grid-column:1/-1;border:0;border-radius:14px;padding:15px;background:#102a47;color:#fff;font-weight:900;font-size:16px}
 #dccTimeStatus{grid-column:1/-1;text-align:center;font-weight:800;color:#35506e}
 .time-summary-row,.time-row{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-top:1px solid #e6ebf1}.time-row div{display:flex;flex-direction:column;gap:4px}.time-row span{color:#66768a;font-size:13px}.time-row strong{white-space:nowrap}

@@ -58,6 +58,59 @@ async function analyzeProjectDrawing(file){
 }
 function save(){localStorage.setItem("dcc-os-state",JSON.stringify(state))}
 function savePricing(){localStorage.setItem("dcc-os-pricing",JSON.stringify(pricing))}
+let scanDrawingState={image:null,review:null,loading:false,error:null};
+function escapeHtml(text){return String(text||"").replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function renderScanDrawingPanel(){
+ const panel=$('#scanDrawingPanel');
+ if(!panel) return;
+ if(scanDrawingState.loading){
+   panel.innerHTML=`<div class="scan-loading"><strong>Scanning drawing…</strong><span>Processing uploaded photo, please wait.</span></div>`;
+   return;
+ }
+ if(scanDrawingState.error){
+   panel.innerHTML=`<div class="scan-error"><strong>Error</strong><p>${escapeHtml(scanDrawingState.error)}</p></div>`;
+   return;
+ }
+ if(scanDrawingState.review){
+   const r=scanDrawingState.review;
+   const renderArray=v=>Array.isArray(v)&&v.length?escapeHtml(v.map(x=>typeof x==='object'?JSON.stringify(x):x).join(', ')): '<em>none</em>';
+   const renderValue=v=>v==null?'<em>unknown</em>':escapeHtml(typeof v==='object'?JSON.stringify(v):v);
+   panel.innerHTML=`<div class="scan-review"><div class="scan-review-row"><span>Customer Name</span><p>${renderValue(r.customerName)}</p></div><div class="scan-review-row"><span>Project Name</span><p>${renderValue(r.projectName)}</p></div><div class="scan-review-row"><span>Countertop Sections</span><p>${renderArray(r.countertopSections)}</p></div><div class="scan-review-row"><span>Lengths</span><p>${renderArray(r.lengths)}</p></div><div class="scan-review-row"><span>Widths / Depths</span><p>${renderArray(r.widths)}</p></div><div class="scan-review-row"><span>Backsplash Dimensions</span><p>${renderValue(r.backsplashDimensions)}</p></div><div class="scan-review-row"><span>Sink Locations</span><p>${renderArray(r.sinkLocations)}</p></div><div class="scan-review-row"><span>Cooktop Locations</span><p>${renderArray(r.cooktopLocations)}</p></div><div class="scan-review-row"><span>Notes</span><p>${renderValue(r.notes)}</p></div><div class="scan-review-row"><span>Confidence</span><p>${renderValue(r.confidence)}</p></div></div>`;
+   if(scanDrawingState.image){
+     panel.innerHTML=`<div class="scan-preview"><img src="${scanDrawingState.image}" alt="Drawing preview"></div>`+panel.innerHTML;
+   }
+   return;
+ }
+ if(scanDrawingState.image){
+   panel.innerHTML=`<div class="scan-preview"><img src="${scanDrawingState.image}" alt="Drawing preview"></div><div class="scan-info"><p>Ready to scan the drawing.</p></div>`;
+   return;
+ }
+ panel.innerHTML=`<div class="scan-empty"><p>Tap Scan Drawing to take or choose a photo, then review the AI extraction here.</p></div>`;
+}
+async function uploadScanDrawing(image){
+ const response = await fetch(apiUrl('/api/drawing-intake'), {
+   method:'POST',
+   headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({image}),
+ });
+ if(!response.ok){
+   let data;
+   try{data=await response.json()}catch{}
+   throw new Error((data&&data.error) || `Scan request failed (${response.status})`);
+ }
+ return await response.json();
+}
+async function triggerScanDrawingUpload(image){
+ scanDrawingState={image,review:null,loading:true,error:null};
+ renderScanDrawingPanel();
+ try{
+   const review = await uploadScanDrawing(image);
+   scanDrawingState={image,review,loading:false,error:null};
+ }catch(error){
+   scanDrawingState={image,review:null,loading:false,error:error.message||String(error)};
+ }
+ renderScanDrawingPanel();
+}
 function jobs(){
     const list=JSON.parse(localStorage.getItem("dcc-os-jobs")||"[]");
 
@@ -309,7 +362,23 @@ function bindScreen(){
         $('#customerDrawingStatus').innerHTML =
             '<strong>No drawing uploaded.</strong>';
     }
-}if($('#purchaseList'))drawPurchase();if($('#kanban'))drawKanban();if($('#savedJobs'))drawSavedJobs();if($('#timeEntries')){bindTimeClock();setTimeout(dccRenderTimeTracking,0);setTimeout(dccRenderTimeSummary,0);setTimeout(dccRenderJobTimeBreakdown,0);setTimeout(dccRenderOutsideHelp,0)}if($('#dccJobCommandV21'))setTimeout(dccRenderJobCommand,0);if($('#dccProductionV22'))setTimeout(dccRenderProductionV22,0);if($('#dccMaterialsV23')){setTimeout(dccRenderMaterialsV23,100);setTimeout(dccRenderPurchaseReconcileV24,180)}if($('#dccInventoryV24'))setTimeout(dccRenderInventoryV24,0);if($('#dccBackboneV25'))setTimeout(dccRenderBackboneV25,0);if($('#dccFreshStartV28'))setTimeout(dccRenderFreshStartV28,0);if($('#dccBusinessReportV26'))setTimeout(dccRenderBusinessReportV26,0);if($('#dccFollowupsV26'))setTimeout(dccRenderFollowupsV26,0);if(current==='pricing')bindPricing();
+}
+const scanInput=$('#scanDrawingInput');
+if(scanInput){
+    scanInput.onchange=async e=>{
+        const f=e.target.files[0];
+        if(!f)return;
+        const rd=new FileReader();
+        rd.onload=()=>{triggerScanDrawingUpload(rd.result)};
+        rd.readAsDataURL(f);
+    };
+}
+const scanButton=$('#scanDrawingButton');
+if(scanButton){scanButton.onclick=()=>{if(scanInput){scanInput.value='';scanInput.click()}}}
+const scanButtonProject=$('#scanDrawingButtonProject');
+if(scanButtonProject){scanButtonProject.onclick=()=>{if(scanInput){scanInput.value='';scanInput.click()}}}
+renderScanDrawingPanel();
+if($('#purchaseList'))drawPurchase();if($('#kanban'))drawKanban();if($('#savedJobs'))drawSavedJobs();if($('#timeEntries')){bindTimeClock();setTimeout(dccRenderTimeTracking,0);setTimeout(dccRenderTimeSummary,0);setTimeout(dccRenderJobTimeBreakdown,0);setTimeout(dccRenderOutsideHelp,0)}if($('#dccJobCommandV21'))setTimeout(dccRenderJobCommand,0);if($('#dccProductionV22'))setTimeout(dccRenderProductionV22,0);if($('#dccMaterialsV23')){setTimeout(dccRenderMaterialsV23,100);setTimeout(dccRenderPurchaseReconcileV24,180)}if($('#dccInventoryV24'))setTimeout(dccRenderInventoryV24,0);if($('#dccBackboneV25'))setTimeout(dccRenderBackboneV25,0);if($('#dccFreshStartV28'))setTimeout(dccRenderFreshStartV28,0);if($('#dccBusinessReportV26'))setTimeout(dccRenderBusinessReportV26,0);if($('#dccFollowupsV26'))setTimeout(dccRenderFollowupsV26,0);if(current==='pricing')bindPricing();
  if(current==='project'){drawModule();$$('[data-module]').forEach(b=>b.addEventListener('click',()=>{activeModule=b.dataset.module;drawModule()}));$('#clearJob').addEventListener('click',()=>{if(confirm('Clear the current DCC job and start fresh?')){state=clone(defaults);save();render('customer')}})}
  if($('#printQuote'))$('#printQuote').onclick=()=>window.print();if($('#nextActionBtn'))$('#nextActionBtn').onclick=()=>render(nextScreen());if($('#newJob'))$('#newJob').onclick=newJob;if($('#saveJob'))$('#saveJob').onclick=saveCurrentJob;
  $$('[data-open-module]').forEach(b=>b.onclick=()=>{activeModule=b.dataset.openModule;render('project')})
