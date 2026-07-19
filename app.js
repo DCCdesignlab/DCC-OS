@@ -59,8 +59,20 @@ async function analyzeProjectDrawing(file){
 function save(){localStorage.setItem("dcc-os-state",JSON.stringify(state))}
 function savePricing(){localStorage.setItem("dcc-os-pricing",JSON.stringify(pricing))}
 let scanDrawingState={image:null,review:null,loading:false,error:null};
+let activeModule = 'countertop';
 function escapeHtml(text){return String(text||"").replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+function restoreSavedScanState(){
+  if(!scanDrawingState.loading){
+    if(!scanDrawingState.image && state.project?.drawing?.image){
+      scanDrawingState.image = state.project.drawing.image;
+    }
+    if(!scanDrawingState.review && state.project?.drawingIntake){
+      scanDrawingState.review = state.project.drawingIntake;
+    }
+  }
+}
 function renderScanDrawingPanel(){
+ restoreSavedScanState();
  const panel=$('#scanDrawingPanel');
  if(!panel) return;
  if(scanDrawingState.loading){
@@ -88,6 +100,9 @@ function renderScanDrawingPanel(){
  panel.innerHTML=`<div class="scan-empty"><p>Tap Scan Drawing to take or choose a photo, then review the AI extraction here.</p></div>`;
 }
 async function uploadScanDrawing(image){
+ if (!image){
+   throw new Error('No image data provided to upload.');
+ }
  const response = await fetch(apiUrl('/api/drawing-intake'), {
    method:'POST',
    headers:{'Content-Type':'application/json'},
@@ -105,7 +120,22 @@ async function triggerScanDrawingUpload(image){
  renderScanDrawingPanel();
  try{
    const review = await uploadScanDrawing(image);
+   state.customerDrawing = image;
+   state.project = Object.assign({}, state.project, {
+     drawing: {
+       image,
+       uploaded: new Date().toISOString(),
+     },
+     drawingIntake: review,
+     aiSummary: review.customerName || review.projectName ? `Drawing analysed for ${review.customerName || 'customer'} / ${review.projectName || 'project'}` : state.project.aiSummary,
+     lastAIUpdate: new Date().toISOString(),
+   });
+   save();
+   updateBindings();
    scanDrawingState={image,review,loading:false,error:null};
+   if($('#customerDrawingStatus')){
+     $('#customerDrawingStatus').innerHTML = '<strong>✓ Drawing uploaded</strong>';
+   }
  }catch(error){
    scanDrawingState={image,review:null,loading:false,error:error.message||String(error)};
  }
@@ -349,6 +379,8 @@ function calc(){return projectMetrics()}
 
 function render(screen=current){if(screen==="mission"||!document.getElementById(screen))screen="customer";current=screen;$$('.tabbar button').forEach(b=>b.classList.toggle('active',b.dataset.screen===screen));$('#screen').innerHTML=$('#'+screen).innerHTML;$('#topStatus').textContent=state.jobStatus||'Draft Quote';bindScreen();updateBindings()}
 function bindScreen(){
+ if(current==='project' && !activeModule){activeModule='countertop'}
+
  $$('input,select,textarea').forEach(el=>{const key=el.id;if(!key||key.startsWith('price'))return;if(
     key==='beforePhoto' ||
     key==='conceptPhoto' ||
@@ -367,9 +399,17 @@ const scanInput=$('#scanDrawingInput');
 if(scanInput){
     scanInput.onchange=async e=>{
         const f=e.target.files[0];
-        if(!f)return;
+        if(!f){
+            return;
+        }
         const rd=new FileReader();
-        rd.onload=()=>{triggerScanDrawingUpload(rd.result)};
+        rd.onload=()=>{
+            triggerScanDrawingUpload(rd.result);
+        };
+        rd.onerror=()=>{
+            scanDrawingState={image:null,review:null,loading:false,error:'Failed to read selected image.'};
+            renderScanDrawingPanel();
+        };
         rd.readAsDataURL(f);
     };
 }
@@ -379,7 +419,7 @@ const scanButtonProject=$('#scanDrawingButtonProject');
 if(scanButtonProject){scanButtonProject.onclick=()=>{if(scanInput){scanInput.value='';scanInput.click()}}}
 renderScanDrawingPanel();
 if($('#purchaseList'))drawPurchase();if($('#kanban'))drawKanban();if($('#savedJobs'))drawSavedJobs();if($('#timeEntries')){bindTimeClock();setTimeout(dccRenderTimeTracking,0);setTimeout(dccRenderTimeSummary,0);setTimeout(dccRenderJobTimeBreakdown,0);setTimeout(dccRenderOutsideHelp,0)}if($('#dccJobCommandV21'))setTimeout(dccRenderJobCommand,0);if($('#dccProductionV22'))setTimeout(dccRenderProductionV22,0);if($('#dccMaterialsV23')){setTimeout(dccRenderMaterialsV23,100);setTimeout(dccRenderPurchaseReconcileV24,180)}if($('#dccInventoryV24'))setTimeout(dccRenderInventoryV24,0);if($('#dccBackboneV25'))setTimeout(dccRenderBackboneV25,0);if($('#dccFreshStartV28'))setTimeout(dccRenderFreshStartV28,0);if($('#dccBusinessReportV26'))setTimeout(dccRenderBusinessReportV26,0);if($('#dccFollowupsV26'))setTimeout(dccRenderFollowupsV26,0);if(current==='pricing')bindPricing();
- if(current==='project'){drawModule();$$('[data-module]').forEach(b=>b.addEventListener('click',()=>{activeModule=b.dataset.module;drawModule()}));$('#clearJob').addEventListener('click',()=>{if(confirm('Clear the current DCC job and start fresh?')){state=clone(defaults);save();render('customer')}})}
+ if(current==='project'){if(!activeModule)activeModule='countertop';drawModule();$$('[data-module]').forEach(b=>b.addEventListener('click',()=>{activeModule=b.dataset.module;drawModule()}));$('#clearJob').addEventListener('click',()=>{if(confirm('Clear the current DCC job and start fresh?')){state=clone(defaults);save();render('customer')}})}
  if($('#printQuote'))$('#printQuote').onclick=()=>window.print();if($('#nextActionBtn'))$('#nextActionBtn').onclick=()=>render(nextScreen());if($('#newJob'))$('#newJob').onclick=newJob;if($('#saveJob'))$('#saveJob').onclick=saveCurrentJob;
  $$('[data-open-module]').forEach(b=>b.onclick=()=>{activeModule=b.dataset.openModule;render('project')})
 }
