@@ -481,7 +481,11 @@ async function dccCloudTimePull(){
 async function dccCloudTimePush(){
   const rows=dccTimeRows();
   try{
-    const r=await fetch(API_BASE+"/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({dccTimeLog:rows})});
+    const r=await fetch(API_BASE+"/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+    key:"dccTimeLog",
+    data:rows
+})
+});
     return r.ok;
   }catch(e){return false}
 }
