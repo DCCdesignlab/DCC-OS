@@ -1084,6 +1084,17 @@ function bindScreen() {
         "<strong>No drawing uploaded.</strong>";
     }
   }
+  if (current === "project") {
+    const moduleTabs = $(".module-tabs");
+    if (moduleTabs && !$("#scanDrawingButtonProject", moduleTabs)) {
+      const projectScanButton = document.createElement("button");
+      projectScanButton.type = "button";
+      projectScanButton.id = "scanDrawingButtonProject";
+      projectScanButton.className = "secondary compact";
+      projectScanButton.textContent = "Scan Drawing";
+      moduleTabs.appendChild(projectScanButton);
+    }
+  }
   const scanInput = $("#scanDrawingInput");
   if (scanInput) {
     scanInput.onchange = async (e) => {
